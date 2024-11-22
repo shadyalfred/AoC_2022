@@ -10,7 +10,7 @@ Move :: enum {
 	Scissors,
 }
 
-CharToMove := map[u8]Move {
+charToMove := map[u8]Move {
 	'A' = Move.Rock,
 	'X' = Move.Rock,
 
@@ -21,22 +21,22 @@ CharToMove := map[u8]Move {
 	'Z' = Move.Scissors,
 }
 
-MoveToWin := map[Move]Move {
-	Move.Rock = Move.Paper,
-	Move.Paper = Move.Scissors,
+moveToWin := [Move]Move {
+	Move.Rock     = Move.Paper,
+	Move.Paper    = Move.Scissors,
 	Move.Scissors = Move.Rock
 }
 
-MoveToLose := map[Move]Move {
-	Move.Rock = Move.Scissors,
-	Move.Paper = Move.Rock,
+moveToLose := [Move]Move {
+	Move.Rock     = Move.Scissors,
+	Move.Paper    = Move.Rock,
 	Move.Scissors = Move.Paper,
 }
 
 GameOutcome :: enum {
 	Loss = 0,
 	Draw = 3,
-	Win = 6,
+	Win  = 6,
 }
 
 play :: proc(my_move, his_move: Move) -> GameOutcome {
@@ -65,14 +65,14 @@ play :: proc(my_move, his_move: Move) -> GameOutcome {
 		}
 	}
 
-	panic("failed to determine outcome of game")
+	panic("failed to determine the outcome of the game")
 }
 
 part_one :: proc(input: string) -> int {
 	input := input
 	score := 0
 	for game in strings.split_lines_iterator(&input) {
-		his_move, my_move := CharToMove[game[0]], CharToMove[game[len(game) - 1]]
+		his_move, my_move := charToMove[game[0]], charToMove[game[len(game) - 1]]
 		game_outcome := play(my_move, his_move)
 		score = score + int(my_move) + int(game_outcome)
 	}
@@ -86,18 +86,18 @@ part_two :: proc(input: string) -> int {
 		my_move: Move
 		needed_outcome: GameOutcome
 
-		his_move, needed_outcome_symbol := CharToMove[game[0]], game[len(game) - 1]
+		his_move, needed_outcome_symbol := charToMove[game[0]], game[len(game) - 1]
 
 		switch needed_outcome_symbol {
 		case 'X':
 			needed_outcome = GameOutcome.Loss
-			my_move = MoveToLose[his_move]
+			my_move = moveToLose[his_move]
 		case 'Y':
 			needed_outcome = GameOutcome.Draw
 			my_move = his_move
 		case:
 			needed_outcome = GameOutcome.Win
-			my_move = MoveToWin[his_move]
+			my_move = moveToWin[his_move]
 		}
 
 		score = score + int(my_move) + int(needed_outcome)
