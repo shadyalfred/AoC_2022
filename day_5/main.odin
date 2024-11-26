@@ -6,6 +6,7 @@ import "core:fmt"
 import "core:unicode"
 import "core:strconv"
 import "core:container/queue"
+import "core:slice"
 
 Crate :: rune
 
@@ -120,10 +121,30 @@ main :: proc() {
 	input := string(file_content)
 
 	stacks, instructions := parse(input)
-	defer free(stacks)
+	defer destroy_stacks(stacks)
 	defer delete(instructions)
 
-	// Can’t run both parts together because the function modifies the stacks array and queues
+	stacks_copy := copy_stacks(stacks)
+	defer destroy_stacks(stacks_copy)
+
 	fmt.printfln("part one: %s", part_one(stacks, instructions))
-	// fmt.printfln("part two: %s", part_two(stacks, instructions))
+	fmt.printfln("part two: %s", part_two(stacks_copy, instructions))
+}
+
+copy_stacks :: proc(stacks: ^[9]Queue(Crate)) -> ^[9]Queue(Crate) {
+	new_stacks := new([9]Queue(Crate))
+
+	for stack, i in stacks {
+		queue.append_elems(&new_stacks[i], ..stack.data[:])
+	}
+
+	return new_stacks
+}
+
+destroy_stacks :: proc(stacks: ^[9]Queue(Crate)) {
+	for &stack in stacks {
+		queue.destroy(&stack)
+	}
+
+	free(stacks)
 }
